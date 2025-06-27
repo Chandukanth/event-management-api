@@ -49,12 +49,13 @@ exports.createEvent = async (req, res) => {
 
 exports.getEvents = async (req, res) => {
   try {
-    const events = await Event.find({ isActive: true });
+    const events = await Event.find();
     res.json(events);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getEventById = async (req, res) => {
   try {
@@ -109,25 +110,16 @@ exports.deleteEvent = async (req, res) => {
 };
 exports.updateEventStatus = async (req, res) => {
   try {
-    const { isActive } = req.body;
-
-    if (typeof isActive !== "boolean") {
-      return res.status(400).json({ message: "Invalid 'isActive' value" });
-    }
-
-    const updated = await Event.findByIdAndUpdate(
+    const { isActive } = req.body; // ✅ Extract the boolean
+    const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
-      { isActive },
+      { isActive }, // ✅ Correct format
       { new: true }
     );
-
-    if (!updated) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    res.json({ message: "Event status updated", event: updated });
+    res.json({ message: "Status updated", event: updatedEvent });
   } catch (err) {
     console.error("Status Update Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
