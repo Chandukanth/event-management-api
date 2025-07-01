@@ -1,6 +1,15 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 exports.signup = async (req, res) => {
   try {
@@ -43,6 +52,16 @@ exports.login = async (req, res) => {
     });
 
     res.json({ token, user: { id: user._id, name: user.name, role: user.role } });
+    await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: 'kruthichandu23@gmail.com',
+          subject: `SOme one login`,
+          html: `<p>Hi some one login</p>
+                 <p>Your ticket for <strong></strong> has been booked successfully.</p>
+                 <p><b>Date:</b>  <br/>
+                 <b>Venue:</b></p>
+                 <p>Thank you!</p>`
+        });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
